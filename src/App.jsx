@@ -11,9 +11,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(
+    () => JSON.parse(localStorage.getItem("FAVORITES")) || []
+  );
   const [count, setCount] = useState(0);
-  let selectedFav = false;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -47,13 +48,17 @@ function App() {
     };
   }, [query]);
 
+  // useEffect(() => {
+  //   const interval = setInterval(() => setCount((c) => c + 1), 1000);
+  //   // clean function
+  //   return function () {
+  //     clearInterval(interval);
+  //   };
+  // }, [count]);
+
   useEffect(() => {
-    const interval = setInterval(() => setCount((c) => c + 1), 1000);
-    // clean function
-    return function () {
-      clearInterval(interval);
-    };
-  }, [count]);
+    localStorage.setItem("FAVORITES", JSON.stringify(favorites));
+  }, [favorites]);
 
   const handleSelectCharacter = (id) => {
     setSelectedId((prevId) => (prevId === id ? null : id));
@@ -63,18 +68,25 @@ function App() {
     setFavorites((preFav) => [...preFav, char]);
   };
 
+  const handleDeleteFavorites = (id) => {
+    setFavorites((preFav) => preFav.filter((fav) => fav.id !== id));
+  };
+
   const isAddToFavorite = favorites.map((fav) => fav.id).includes(selectedId);
 
   // console.log(selectedId);
 
   return (
     <div className="app">
-      <div style={{ color: "#fff" }}>{count}</div>
+      {/* <div style={{ color: "#fff" }}>{count}</div> */}
       <Toaster />
       <Navbar characters={characters}>
         <Search query={query} setQuery={setQuery} />
         <SearchResult numOfResult={characters.length} />
-        <Favorites numOfFavorites={favorites.length} />
+        <Favorites
+          favorites={favorites}
+          onDeleteFavorites={handleDeleteFavorites}
+        />
       </Navbar>
       <div className="main">
         <CharacterList

@@ -18,7 +18,17 @@ function CharacterList({
             item={item}
             onSelectCharacter={onSelectCharacter}
             selectedId={selectedId}
-          />
+          >
+            <button
+              className="icon red"
+              onClick={() => {
+                e.stopPropagation();
+                onSelectCharacter(item.id);
+              }}
+            >
+              {selectedId === item.id ? <EyeSlashIcon /> : <EyeIcon />}
+            </button>
+          </Character>
         ))
       )}
     </div>
@@ -27,15 +37,14 @@ function CharacterList({
 
 export default CharacterList;
 
-function Character({ item, onSelectCharacter, selectedId }) {
+export function Character({ item, children, onSelectCharacter, selectedId }) {
   return (
-    <div className="list__item">
+    <div className="list__item" onClick={() => onSelectCharacter(item.id)}>
       <img src={item.image} alt={item.name} />
       <CharacterName item={item} />
       <CharacterInfo item={item} />
-      <button className="icon red" onClick={() => onSelectCharacter(item.id)}>
-        {selectedId === item.id ? <EyeSlashIcon /> : <EyeIcon />}
-      </button>
+      {selectedId === item.id && <CharacterInfo item={item} />}
+      {children}
     </div>
   );
 }
